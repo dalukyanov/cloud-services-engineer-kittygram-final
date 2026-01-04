@@ -106,3 +106,4 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           source: "docker-compose.production.yml"
           target: "kittygram/"
+
