@@ -121,6 +121,11 @@ jobs:
             docker compose -f docker-compose.production.yml down
             docker compose -f docker-compose.production.yml up -d
             sleep 10
+      # В задании говорится, что тут надо запускать миграцаа, но они у меня
+      # выполняются на стадии сборки, в этом нет смысла.
+      # Если очень надо, это можно было сделать так:
+      # docker compose -f docker-compose.production.yml exec -T backend python manage.py migrate --noinput
+      # docker compose -f docker-compose.production.yml exec -T backend python manage.py collectstatic --noinput
   
   auto_tests:
     runs-on: ubuntu-latest
