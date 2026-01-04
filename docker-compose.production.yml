@@ -1,5 +1,4 @@
-#version - deprecated
-#version: '3.8'
+# version: '3.8' - deprecated
 
 volumes:
   pg_data:
@@ -12,23 +11,29 @@ services:
     env_file: .env
     volumes:
       - pg_data:/var/lib/postgresql/data
+    networks:
+      - kittygram_network
 
   backend:
-    build: ./backend
+    image: indeicheg/kittygram_backend:latest
     env_file: .env
-    depends_on:
-      - postgres
     volumes:
       - static:/app/collected_static
       - media:/app/media
+    depends_on:
+      - postgres
+    networks:
+      - kittygram_network
 
   frontend:
-    build: ./frontend
+    image: indeicheg/kittygram_frontend:latest
     volumes:
       - static:/app/static
+    networks:
+      - kittygram_network
 
   gateway:
-    build: ./nginx
+    image: indeicheg/kittygram_gateway:latest
     ports:
       - "80:80"
     volumes:
@@ -37,3 +42,9 @@ services:
     depends_on:
       - backend
       - frontend
+    networks:
+      - kittygram_network
+
+networks:
+  kittygram_network:
+    driver: bridge
