@@ -125,6 +125,7 @@ jobs:
   telegram-notify:
     runs-on: ubuntu-latest
 #    needs: auto_tests
+    needs: deploy
     if: success()
     steps:
       - name: Send Telegram notification
