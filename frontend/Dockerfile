@@ -1,13 +1,17 @@
 FROM node:18
 WORKDIR /app
 
-COPY package.json package.json
-COPY package-lock.json package-lock.json
-
+COPY package*.json ./
 RUN npm ci
 
 COPY . .
 RUN npm run build
-RUN npm install --global http-server
 
+RUN mkdir -p /app/static && cp -r /app/build/. /app/static/
+
+RUN if [ -d /app/static/static ]; then \
+      mv /app/static/static/* /app/static/ && rmdir /app/static/static; \
+    fi
+
+EXPOSE 8000
 CMD ["npx", "-y", "http-server", "-p", "8000", "/app/build"]
