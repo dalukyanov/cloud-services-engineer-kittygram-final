@@ -115,20 +115,11 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd kittygram
-            # Создаём .env на сервере
-            cat > .env <<EOF
-DB_ENGINE=django.db.backends.postgresql
-POSTGRES_DB=kittygram
-POSTGRES_USER=kittygram_user
-POSTGRES_PASSWORD=kittygram_password
-POSTGRES_HOST=postgres
-POSTGRES_PORT=5432
-EOF
-            # Выполняем деплой
+            # Создаём .env из GitHub Secret
+            echo '${{ secrets.ENV_FILE }}' > .env
             docker compose -f docker-compose.production.yml pull
             docker compose -f docker-compose.production.yml down
             docker compose -f docker-compose.production.yml up -d
             sleep 10
-            # Выполняем миграции и сбор статики (вдруг entrypoint не сработал)
-            # docker compose -f docker-compose.production.yml exec -T backend python manage.py migrate --noinput
-            # docker compose -f docker-compose.production.yml exec -T backend python manage.py collectstatic --noinput
+      
+      
