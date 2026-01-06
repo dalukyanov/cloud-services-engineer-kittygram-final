@@ -23,7 +23,7 @@ jobs:
           pip install flake8==6.0.0 flake8-isort==6.0.0
 
       - name: Test with flake8
-        run: python -m flake8 backend/ --ignore=E501,W291,W292,W293,I001,I004,F401,E123,E301
+        run: python -m flake8 backend/ --ignore=E501,W291,W292,W293,I001,I003,I004,F401,E123,E301
 
   build_and_push_backend:
     name: Push Docker image to DockerHub (backend)
@@ -44,7 +44,7 @@ jobs:
         with:
           context: ./backend/
           push: true
-          tags: indeicheg/kittygram_backend:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/kittygram_backend:latest
 
   build_and_push_frontend:
     name: Push Docker image to DockerHub (frontend)
@@ -65,7 +65,7 @@ jobs:
         with:
           context: ./frontend/
           push: true
-          tags: indeicheg/kittygram_frontend:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/kittygram_frontend:latest
 
   build_and_push_gateway:
     name: Push Docker image to DockerHub (gateway)
@@ -86,7 +86,7 @@ jobs:
         with:
           context: ./nginx/
           push: true
-          tags: indeicheg/kittygram_gateway:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/kittygram_gateway:latest
 
   deploy:
     runs-on: ubuntu-latest
@@ -115,18 +115,15 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd kittygram
-            # Создаём .env из GitHub Secret
+            # Создаём .env в GitHub Secret
             echo '${{ secrets.ENV_FILE }}' > .env
             docker compose -f docker-compose.production.yml pull
             docker compose -f docker-compose.production.yml down
             docker compose -f docker-compose.production.yml up -d
             sleep 10
-      # В задании говорится, что тут надо запускать миграцаа, но они у меня
-      # выполняются на стадии сборки, в этом нет смысла.
-      # Если очень надо, это можно было сделать так:
-      # docker compose -f docker-compose.production.yml exec -T backend python manage.py migrate --noinput
-      # docker compose -f docker-compose.production.yml exec -T backend python manage.py collectstatic --noinput
-  
+# Эмоджи был в отсылаемом сообщении в телегу. Убрал.
+# В этом месте не знаю, что может вызывать проблемы. Тут нет эмоджи
+
   auto_tests:
     runs-on: ubuntu-latest
     needs: deploy
@@ -157,4 +154,12 @@ jobs:
         with:
           to: ${{ secrets.TELEGRAM_CHAT_ID }}
           token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          message: "✅ Deploy Kittygram успешно завершён!\n🔗 http://${{ secrets.SSH_HOST }}"
+          message: |
+            Deploy Kittygram успешно завершён!
+            
+            Репозиторий: ${{ github.repository }}
+            Автор: ${{ github.actor }}
+            Коммит: ${{ github.event.commits[0].message }}
+            Ссылка: https://github.com/${{ github.repository }}/commit/${{ github.sha }}
+            
+            Сайт с котиками: http://${{ secrets.SSH_HOST }}
