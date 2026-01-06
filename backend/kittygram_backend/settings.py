@@ -5,12 +5,15 @@ from django.core.management.utils import get_random_secret_key
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# По комментарию от ревьювера ключ добавлен в качестве переменной окружения
-# в секреты, либо генерится на ходу
+# По комментарию от ревьювера ключ DJANGO_SECRET_KEY добавлен в качестве
+# переменной окружения в секреты, либо генерится на ходу
 
 SECRET_KEY = os.getenv('DJANGO_SECRET_KEY') or get_random_secret_key()
 
-DEBUG = True
+# По комментарию от ревьювера ключ DJANGO_DEBUG добавлен в качестве переменной
+# окружения в секреты
+
+DEBUG = os.getenv('DJANGO_DEBUG', 'False').lower() in ('true', '1', 't', 'yes')
 
 ALLOWED_HOSTS = ['*']
 
