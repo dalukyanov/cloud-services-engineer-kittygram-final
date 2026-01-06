@@ -5,6 +5,8 @@ from django.core.management.utils import get_random_secret_key
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# По комментарию от ревьювера ключ добавлен в качестве переменной окружения
+# в секреты, либо генерится на ходу
 SECRET_KEY = os.getenv('DJANGO_SECRET_KEY') or get_random_secret_key()
 
 DEBUG = True
